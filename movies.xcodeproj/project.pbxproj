@@ -14,6 +14,11 @@
 		C677935D2C41C65200EEE40A /* moviesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C677935C2C41C65200EEE40A /* moviesTests.swift */; };
 		C67793672C41C65200EEE40A /* moviesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67793662C41C65200EEE40A /* moviesUITests.swift */; };
 		C67793692C41C65200EEE40A /* moviesUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67793682C41C65200EEE40A /* moviesUITestsLaunchTests.swift */; };
+		C67793772C41C72100EEE40A /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67793762C41C72100EEE40A /* NetworkService.swift */; };
+		C67793792C41C74A00EEE40A /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67793782C41C74A00EEE40A /* Endpoint.swift */; };
+		C677937B2C41C76000EEE40A /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C677937A2C41C76000EEE40A /* HTTPClient.swift */; };
+		C677937D2C41C7C000EEE40A /* RequestMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = C677937C2C41C7C000EEE40A /* RequestMethod.swift */; };
+		C677937F2C41C7D400EEE40A /* RequestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C677937E2C41C7D400EEE40A /* RequestError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +49,11 @@
 		C67793622C41C65200EEE40A /* moviesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = moviesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C67793662C41C65200EEE40A /* moviesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moviesUITests.swift; sourceTree = "<group>"; };
 		C67793682C41C65200EEE40A /* moviesUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moviesUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C67793762C41C72100EEE40A /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		C67793782C41C74A00EEE40A /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		C677937A2C41C76000EEE40A /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		C677937C2C41C7C000EEE40A /* RequestMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestMethod.swift; sourceTree = "<group>"; };
+		C677937E2C41C7D400EEE40A /* RequestError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +104,7 @@
 		C677934A2C41C65100EEE40A /* movies */ = {
 			isa = PBXGroup;
 			children = (
+				C67793752C41C70700EEE40A /* Networking */,
 				C677934B2C41C65100EEE40A /* moviesApp.swift */,
 				C677934D2C41C65100EEE40A /* ContentView.swift */,
 				C677934F2C41C65200EEE40A /* Assets.xcassets */,
@@ -125,6 +136,18 @@
 				C67793682C41C65200EEE40A /* moviesUITestsLaunchTests.swift */,
 			);
 			path = moviesUITests;
+			sourceTree = "<group>";
+		};
+		C67793752C41C70700EEE40A /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				C67793762C41C72100EEE40A /* NetworkService.swift */,
+				C67793782C41C74A00EEE40A /* Endpoint.swift */,
+				C677937A2C41C76000EEE40A /* HTTPClient.swift */,
+				C677937C2C41C7C000EEE40A /* RequestMethod.swift */,
+				C677937E2C41C7D400EEE40A /* RequestError.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -257,7 +280,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C677937F2C41C7D400EEE40A /* RequestError.swift in Sources */,
 				C677934E2C41C65100EEE40A /* ContentView.swift in Sources */,
+				C677937B2C41C76000EEE40A /* HTTPClient.swift in Sources */,
+				C67793772C41C72100EEE40A /* NetworkService.swift in Sources */,
+				C67793792C41C74A00EEE40A /* Endpoint.swift in Sources */,
+				C677937D2C41C7C000EEE40A /* RequestMethod.swift in Sources */,
 				C677934C2C41C65100EEE40A /* moviesApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
