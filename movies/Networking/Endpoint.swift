@@ -12,4 +12,5 @@ protocol Endpoint {
     var path: String { get }
     var method: RequestMethod { get }
     var headers: [String: String]? { get }
+    var queryItems: [URLQueryItem]? { get }
 }

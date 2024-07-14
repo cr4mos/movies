@@ -7,11 +7,10 @@
 
 import Foundation
 
-// MARK: - HTTP Client Protocol
+// MARK: - HTTPClient Extension
 protocol HTTPClient {
-    func sendRequest<T: Decodable, U: Encodable>(
+    func sendRequest<T: Decodable>(
         endpoint: Endpoint,
-        requestBody: U?,
         responseModel: T.Type
     ) async -> Result<T, RequestError>
 }
@@ -38,19 +37,13 @@ extension HTTPClient {
         return request
     }
 
-    // Send Request with Optional Body
-    func sendRequest<T: Decodable, U: Encodable>(
+    // Send Request without Body
+    func sendRequest<T: Decodable>(
         endpoint: Endpoint,
-        requestBody: U? = nil,
         responseModel: T.Type
     ) async -> Result<T, RequestError> {
         do {
-            var request = try buildRequest(from: endpoint)
-            if let requestBody = requestBody {
-                let jsonData = try JSONEncoder().encode(requestBody)
-                request.httpBody = jsonData
-                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            }
+            let request = try buildRequest(from: endpoint)
             return await performRequest(request, responseModel: responseModel)
         } catch let error as RequestError {
             return .failure(error)
@@ -65,33 +58,35 @@ extension HTTPClient {
         responseModel: T.Type
     ) async -> Result<T, RequestError> {
         do {
+            guard let apiKey = APIKeyManager.shared.apiKey else {
+                return .failure(.invalidURL("API key is missing"))
+            }
+
+            var request = request
+            var urlComponents = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)!
+            urlComponents.queryItems = (urlComponents.queryItems ?? []) + [URLQueryItem(name: "api_key", value: apiKey)]
+            request.url = urlComponents.url
+
             let (data, response) = try await URLSession.shared.data(for: request)
             log(request: request, data: data, response: response)
-            return handleResponse(data, response, responseModel)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return .failure(.noResponse)
+            }
+
+            switch httpResponse.statusCode {
+            case 200...299:
+                guard let decodedResponse = try? JSONDecoder().decode(responseModel, from: data) else {
+                    return .failure(.decode)
+                }
+                return .success(decodedResponse)
+            case 401:
+                return .failure(.unauthorized)
+            default:
+                return .failure(.unexpectedStatusCode("Received HTTP status code: \(httpResponse.statusCode)"))
+            }
         } catch {
             return .failure(.unknown(error.localizedDescription))
-        }
-    }
-
-    // Handle the response and decode
-    private func handleResponse<T: Decodable>(
-        _ data: Data?,
-        _ response: URLResponse?,
-        _ responseModel: T.Type
-    ) -> Result<T, RequestError> {
-        guard let httpResponse = response as? HTTPURLResponse else {
-            return .failure(.noResponse)
-        }
-        switch httpResponse.statusCode {
-        case 200...299:
-            guard let data = data, let decodedResponse = try? JSONDecoder().decode(responseModel, from: data) else {
-                return .failure(.decode)
-            }
-            return .success(decodedResponse)
-        case 401:
-            return .failure(.unauthorized)
-        default:
-            return .failure(.unexpectedStatusCode("Received HTTP status code: \(httpResponse.statusCode)"))
         }
     }
 
@@ -106,5 +101,86 @@ extension HTTPClient {
             print("Response: \(response)")
         }
         #endif
+    }
+}
+
+import Security
+
+class KeychainHelper {
+    static let shared = KeychainHelper()
+
+    func save(_ data: Data, service: String, account: String) {
+        let query = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
+            kSecAttrAccount: account,
+            kSecValueData: data
+        ] as CFDictionary
+
+        SecItemDelete(query)
+        SecItemAdd(query, nil)
+    }
+
+    func read(service: String, account: String) -> Data? {
+        let query = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
+            kSecAttrAccount: account,
+            kSecReturnData: true,
+            kSecMatchLimit: kSecMatchLimitOne
+        ] as CFDictionary
+
+        var dataTypeRef: AnyObject?
+        let status = SecItemCopyMatching(query, &dataTypeRef)
+
+        if status == errSecSuccess {
+            return dataTypeRef as? Data
+        } else {
+            return nil
+        }
+    }
+
+    func delete(service: String, account: String) {
+        let query = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: service,
+            kSecAttrAccount: account
+        ] as CFDictionary
+
+        SecItemDelete(query)
+    }
+}
+
+import Foundation
+
+class APIKeyManager {
+    static let shared = APIKeyManager()
+
+    private let keychainService = "com.mymovieapp.api"
+    private let apiKeyAccount = "apiKey"
+
+    var apiKey: String? {
+        get {
+            // Try to read from Keychain first
+            if let data = KeychainHelper.shared.read(service: keychainService, account: apiKeyAccount),
+               let key = String(data: data, encoding: .utf8) {
+                return key
+            }
+            // If not available in Keychain, get from Info.plist
+            if let key = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String {
+                print("API_KEY from Info.plist:", key) // Debug print
+                self.apiKey = key // Save to Keychain for future use
+                return key
+            }
+            return nil
+        }
+        set {
+            guard let value = newValue else {
+                KeychainHelper.shared.delete(service: keychainService, account: apiKeyAccount)
+                return
+            }
+            let data = Data(value.utf8)
+            KeychainHelper.shared.save(data, service: keychainService, account: apiKeyAccount)
+        }
     }
 }

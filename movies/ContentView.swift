@@ -8,17 +8,79 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = MoviesViewModel()
+    @State private var isGridView: Bool = false
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                Picker("View Style", selection: $isGridView) {
+                    Text("List").tag(false)
+                    Text("Grid").tag(true)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+
+                if viewModel.isLoading && viewModel.movies.isEmpty {
+                    ProgressView()
+                } else if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                } else {
+                    if isGridView {
+                        gridView
+                    } else {
+                        listView
+                    }
+                }
+            }
+            .navigationTitle("Most Popular Movies")
+            .onAppear {
+                viewModel.fetchMostPopularMovies()
+            }
         }
-        .padding()
+    }
+
+    private var listView: some View {
+        List {
+            ForEach(viewModel.movies) { movie in
+                VStack(alignment: .leading) {
+                    Text(movie.title)
+                        .font(.headline)
+                    Text(movie.overview)
+                        .font(.subheadline)
+                }
+                .onAppear {
+                    viewModel.loadMoreMoviesIfNeeded(currentMovie: movie)
+                }
+            }
+
+            if viewModel.isLoading {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+            }
+        }
+    }
+
+    private var gridView: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                ForEach(viewModel.movies) { movie in
+                    VStack(alignment: .leading) {
+                        Text(movie.title)
+                            .font(.headline)
+                        Text(movie.overview)
+                            .font(.subheadline)
+                    }
+                    .onAppear {
+                        viewModel.loadMoreMoviesIfNeeded(currentMovie: movie)
+                    }
+                }
+            }
+            .padding()
+        }
     }
 }
 
-#Preview {
-    ContentView()
-}

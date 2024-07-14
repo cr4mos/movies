@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig
+//  movies
+//
+//  Created by Carlos Ramos on 14/07/24.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+API_KEY = b0febe3d57cec806344fce685ae276db
