@@ -34,3 +34,10 @@ struct Movie: Identifiable, Decodable {
         case originalLanguage = "original_language"
     }
 }
+
+extension Movie {
+    var genresDescription: String {
+        let genreNames = genreIds.map { GenreService.shared.genreName(for: $0) }
+        return genreNames.joined(separator: ", ")
+    }
+}

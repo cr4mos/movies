@@ -17,7 +17,9 @@ struct MostPopularView: View {
             if viewModel.isLoading && viewModel.movies.isEmpty {
                 ProgressView()
             } else if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
+                ErrorStateView(message: errorMessage, emoji: "❌")
+            } else if viewModel.isEmptyState {
+                ErrorStateView(message: "No popular movies found.", emoji: "🙁")
             } else {
                 if isGridView {
                     MovieGridView(viewModel: viewModel, searchText: $searchText)
