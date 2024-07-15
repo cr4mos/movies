@@ -10,7 +10,7 @@ import Foundation
 class GenreService {
     static let shared = GenreService()
 
-    private(set) var genres: [Int: String] = [:]
+    @Published private(set) var genres: [Int: String] = [:]
 
     private init() {}
 

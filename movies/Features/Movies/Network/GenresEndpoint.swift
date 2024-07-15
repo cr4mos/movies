@@ -13,7 +13,12 @@ enum GenresEndpoint {
 
 extension GenresEndpoint: Endpoint {
     var queryItems: [URLQueryItem]? {
-        nil
+        switch self {
+        case .movieGenres:
+            return [
+                URLQueryItem(name: "api_key", value: APIKeyManager.shared.apiKey ?? "")
+            ]
+        }
     }
     
     var baseURL: URL? {

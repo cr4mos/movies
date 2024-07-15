@@ -25,15 +25,14 @@ struct MovieGridView: View {
                 ForEach(filteredMovies) { movie in
                     NavigationLink(destination: MovieDetailView(movie: movie)) {
                         VStack(alignment: .leading, spacing: 8) {
-                            if let posterPath = movie.posterPath {
-                                AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")) { image in
-                                    image.resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .cornerRadius(8)
-                                } placeholder: {
+                            if let posterPath = movie.posterPath, 
+                                let url = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)") {
+                                CachedAsyncImage(url: url) {
                                     ProgressView()
                                         .frame(width: 150, height: 225)
                                 }
+                                .frame(maxWidth: 150, maxHeight: 225)
+                                .cornerRadius(8)
                             } else {
                                 Color.gray
                                     .frame(height: 225)

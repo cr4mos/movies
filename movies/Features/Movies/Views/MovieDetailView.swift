@@ -13,14 +13,12 @@ struct MovieDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if let backdropPath = movie.backdropPath {
-                    AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w780\(backdropPath)")) { image in
-                        image.resizable()
-                            .aspectRatio(contentMode: .fit)
-                    } placeholder: {
-                        Color.gray
-                            .frame(height: 200)
+                if let backdropPath = movie.backdropPath,
+                   let url = URL(string: "https://image.tmdb.org/t/p/w780\(backdropPath)") {
+                    CachedAsyncImage(url: url) {
+                        ProgressView()
                     }
+                    .frame(maxWidth: .infinity)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -55,7 +53,7 @@ struct MovieDetailView: View {
                     HStack {
                         Image(systemName: "calendar")
                             .foregroundColor(.red)
-                        Text("Release Date: \(formattedDate(movie.releaseDate))")
+                        Text("Release Date: \(DateFormatterHelper.formattedDate(movie.releaseDate))")
                         Spacer()
                         Image(systemName: "globe")
                             .foregroundColor(.green)
@@ -69,15 +67,5 @@ struct MovieDetailView: View {
         }
         .navigationTitle(movie.title)
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private func formattedDate(_ dateString: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        if let date = dateFormatter.date(from: dateString) {
-            dateFormatter.dateStyle = .medium
-            return dateFormatter.string(from: date)
-        }
-        return dateString
     }
 }

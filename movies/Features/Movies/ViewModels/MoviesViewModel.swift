@@ -18,6 +18,12 @@ class MoviesViewModel: ObservableObject {
     private var totalPages: Int = 1
     private var currentCategory: Category = .mostPopular
 
+    init() {
+        Task {
+            await GenreService.shared.fetchGenres()
+        }
+    }
+
     enum Category {
         case mostPopular
         case nowPlaying
