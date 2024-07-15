@@ -93,94 +93,13 @@ extension HTTPClient {
     // Log the request and response for debugging purposes
     private func log(request: URLRequest, data: Data?, response: URLResponse?) {
         #if DEBUG
-//        print("Request: \(request)")
-//        if let data = data {
-//            print("Response Data: \(String(data: data, encoding: .utf8) ?? "N/A")")
-//        }
-//        if let response = response {
-//            print("Response: \(response)")
-//        }
+        print("Request: \(request)")
+        if let data = data {
+            print("Response Data: \(String(data: data, encoding: .utf8) ?? "N/A")")
+        }
+        if let response = response {
+            print("Response: \(response)")
+        }
         #endif
-    }
-}
-
-import Security
-
-class KeychainHelper {
-    static let shared = KeychainHelper()
-
-    func save(_ data: Data, service: String, account: String) {
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: service,
-            kSecAttrAccount: account,
-            kSecValueData: data
-        ] as CFDictionary
-
-        SecItemDelete(query)
-        SecItemAdd(query, nil)
-    }
-
-    func read(service: String, account: String) -> Data? {
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: service,
-            kSecAttrAccount: account,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne
-        ] as CFDictionary
-
-        var dataTypeRef: AnyObject?
-        let status = SecItemCopyMatching(query, &dataTypeRef)
-
-        if status == errSecSuccess {
-            return dataTypeRef as? Data
-        } else {
-            return nil
-        }
-    }
-
-    func delete(service: String, account: String) {
-        let query = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: service,
-            kSecAttrAccount: account
-        ] as CFDictionary
-
-        SecItemDelete(query)
-    }
-}
-
-import Foundation
-
-class APIKeyManager {
-    static let shared = APIKeyManager()
-
-    private let keychainService = "com.mymovieapp.api"
-    private let apiKeyAccount = "apiKey"
-
-    var apiKey: String? {
-        get {
-            // Try to read from Keychain first
-            if let data = KeychainHelper.shared.read(service: keychainService, account: apiKeyAccount),
-               let key = String(data: data, encoding: .utf8) {
-                return key
-            }
-            // If not available in Keychain, get from Info.plist
-            if let key = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String {
-                print("API_KEY from Info.plist:", key) // Debug print
-                self.apiKey = key // Save to Keychain for future use
-                return key
-            }
-            return nil
-        }
-        set {
-            guard let value = newValue else {
-                KeychainHelper.shared.delete(service: keychainService, account: apiKeyAccount)
-                return
-            }
-            let data = Data(value.utf8)
-            KeychainHelper.shared.save(data, service: keychainService, account: apiKeyAccount)
-        }
     }
 }
