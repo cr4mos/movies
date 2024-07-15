@@ -14,7 +14,7 @@ struct MovieDetailsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(movie.title)
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.customFont)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
             Text(movie.genresDescription)
