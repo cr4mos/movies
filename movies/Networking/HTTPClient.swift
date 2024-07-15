@@ -93,13 +93,13 @@ extension HTTPClient {
     // Log the request and response for debugging purposes
     private func log(request: URLRequest, data: Data?, response: URLResponse?) {
         #if DEBUG
-        print("Request: \(request)")
-        if let data = data {
-            print("Response Data: \(String(data: data, encoding: .utf8) ?? "N/A")")
-        }
-        if let response = response {
-            print("Response: \(response)")
-        }
+//        print("Request: \(request)")
+//        if let data = data {
+//            print("Response Data: \(String(data: data, encoding: .utf8) ?? "N/A")")
+//        }
+//        if let response = response {
+//            print("Response: \(response)")
+//        }
         #endif
     }
 }
