@@ -41,38 +41,8 @@ struct MovieListView: View {
                                     .cornerRadius(8)
                             }
 
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(movie.title)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                    .lineLimit(2)
-                                Text(movie.genresDescription)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.leading)
-                                HStack {
-                                    Image(systemName: "star.fill")
-                                        .foregroundColor(.yellow)
-                                    Text("\(movie.voteAverage, specifier: "%.1f")")
-                                }
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                HStack {
-                                    Image(systemName: "chart.bar.fill")
-                                        .foregroundColor(.blue)
-                                    Text("\(Int(movie.popularity))")
-                                }
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                HStack {
-                                    Image(systemName: "calendar")
-                                        .foregroundColor(.red)
-                                    Text(formattedDate(movie.releaseDate))
-                                }
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            }
-                            .padding(.trailing)
+                            MovieDetailsView(movie: movie)
+                                .padding(.trailing)
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -97,15 +67,5 @@ struct MovieListView: View {
             }
         }
         .background(Color(.systemBackground))
-    }
-
-    private func formattedDate(_ dateString: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        if let date = dateFormatter.date(from: dateString) {
-            dateFormatter.dateStyle = .medium
-            return dateFormatter.string(from: date)
-        }
-        return dateString
     }
 }

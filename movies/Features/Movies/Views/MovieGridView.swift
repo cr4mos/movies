@@ -21,7 +21,7 @@ struct MovieGridView: View {
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 ForEach(filteredMovies) { movie in
                     NavigationLink(destination: MovieDetailView(movie: movie)) {
                         VStack(alignment: .leading, spacing: 8) {
@@ -41,22 +41,13 @@ struct MovieGridView: View {
                                     .cornerRadius(8)
                             }
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(movie.title)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                    .lineLimit(2)
-                                Text(movie.genresDescription)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                            }
+                            MovieDetailsView(movie: movie)
                         }
                         .padding()
+                        .frame(height: 400, alignment: .top)
                         .background(Color(UIColor.systemBackground))
                         .cornerRadius(8)
                         .shadow(radius: 4)
-                        .frame(maxWidth: .infinity) // Ensure full width
                     }
                     .onAppear {
                         viewModel.loadMoreMoviesIfNeeded(currentMovie: movie)
