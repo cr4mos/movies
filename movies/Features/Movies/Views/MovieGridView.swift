@@ -21,7 +21,7 @@ struct MovieGridView: View {
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+            LazyVGrid(columns: [adaptiveGridItem()], spacing: 16) {
                 ForEach(filteredMovies) { movie in
                     NavigationLink(destination: MovieDetailView(movie: movie)) {
                         VStack(alignment: .leading, spacing: 8) {
@@ -29,7 +29,6 @@ struct MovieGridView: View {
                                 AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")) { image in
                                     image.resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: 150, height: 225)
                                         .cornerRadius(8)
                                 } placeholder: {
                                     ProgressView()
@@ -37,14 +36,15 @@ struct MovieGridView: View {
                                 }
                             } else {
                                 Color.gray
-                                    .frame(width: 150, height: 225)
+                                    .frame(height: 225)
                                     .cornerRadius(8)
                             }
 
                             MovieDetailsView(movie: movie)
                         }
                         .padding()
-                        .frame(height: 400, alignment: .top)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 400)
                         .background(Color(UIColor.systemBackground))
                         .cornerRadius(8)
                         .shadow(radius: 4)
@@ -66,5 +66,9 @@ struct MovieGridView: View {
             .padding()
         }
         .background(Color(.systemBackground))
+    }
+
+    private func adaptiveGridItem() -> GridItem {
+        return GridItem(.adaptive(minimum: 150), spacing: 16)
     }
 }
