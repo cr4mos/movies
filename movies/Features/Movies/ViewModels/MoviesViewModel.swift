@@ -15,8 +15,15 @@ class MoviesViewModel: ObservableObject {
     @Published var currentPage: Int = 1
     @Published var totalPages: Int = 1
     @Published var selectedCategory: MovieCategory = .mostPopular
+    private(set) var genres: [Int: String] = [:]
 
     private let networkService = NetworkService.shared
+
+    init() {
+        Task {
+            await GenreService.shared.fetchGenres()
+        }
+    }
 
     enum MovieCategory: String, CaseIterable, Identifiable {
         case mostPopular = "Most Popular"
@@ -79,5 +86,40 @@ class MoviesViewModel: ObservableObject {
         totalPages = 1
         movies = []
         fetchMovies(page: 1)
+    }
+
+}
+
+extension Movie {
+    var genresDescription: String {
+        let genreNames = genreIds.map { GenreService.shared.genreName(for: $0) }
+        return genreNames.joined(separator: ", ")
+    }
+}
+
+
+class GenreService {
+    static let shared = GenreService()
+
+    private(set) var genres: [Int: String] = [:]
+
+    private init() {}
+
+    func fetchGenres() async {
+        let endpoint = GenresEndpoint.movieGenres
+        let result = await NetworkService.shared.sendRequest(endpoint: endpoint, responseModel: GenreResponse.self)
+
+        switch result {
+        case .success(let response):
+            for genre in response.genres {
+                genres[genre.id] = genre.name
+            }
+        case .failure(let error):
+            print("Error fetching genres: \(error)")
+        }
+    }
+
+    func genreName(for id: Int) -> String {
+        return genres[id] ?? "Unknown"
     }
 }

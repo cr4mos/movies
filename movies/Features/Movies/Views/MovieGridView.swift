@@ -9,31 +9,71 @@ import SwiftUI
 
 struct MovieGridView: View {
     @ObservedObject var viewModel: MoviesViewModel
+    @Binding var searchText: String
+
+    var filteredMovies: [Movie] {
+        if searchText.isEmpty {
+            return viewModel.movies
+        } else {
+            return viewModel.movies.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                ForEach(viewModel.movies) { movie in
-                    VStack(alignment: .leading) {
-                        Text(movie.title)
-                            .font(.headline)
-                        Text(movie.overview)
-                            .font(.subheadline)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                ForEach(filteredMovies) { movie in
+                    NavigationLink(destination: MovieDetailView(movie: movie)) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            if let posterPath = movie.posterPath {
+                                AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")) { image in
+                                    image.resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 150, height: 225)
+                                        .cornerRadius(8)
+                                } placeholder: {
+                                    ProgressView()
+                                        .frame(width: 150, height: 225)
+                                }
+                            } else {
+                                Color.gray
+                                    .frame(width: 150, height: 225)
+                                    .cornerRadius(8)
+                            }
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(movie.title)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                    .lineLimit(2)
+                                Text(movie.genresDescription)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                            }
+                        }
+                        .padding()
+                        .background(Color(UIColor.systemBackground))
+                        .cornerRadius(8)
+                        .shadow(radius: 4)
+                        .frame(maxWidth: .infinity) // Ensure full width
                     }
                     .onAppear {
                         viewModel.loadMoreMoviesIfNeeded(currentMovie: movie)
                     }
                 }
-            }
-            .padding()
 
-            if viewModel.isLoading {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
+                if viewModel.isLoading {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
+                    }
+                    .padding()
                 }
             }
+            .padding()
         }
+        .background(Color(.systemBackground))
     }
 }

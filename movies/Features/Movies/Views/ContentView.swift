@@ -10,44 +10,57 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var viewModel = MoviesViewModel()
     @State private var isGridView: Bool = false
+    @State private var searchText: String = ""
+    @State private var selectedTab: Tab = .mostPopular
+
+    enum Tab {
+        case mostPopular
+        case nowPlaying
+    }
 
     var body: some View {
-        NavigationView {
-            VStack {
-                Picker("Category", selection: $viewModel.selectedCategory) {
-                    ForEach(MoviesViewModel.MovieCategory.allCases) { category in
-                        Text(category.rawValue).tag(category)
+        TabView(selection: $selectedTab) {
+            NavigationStack {
+                MostPopularView(viewModel: viewModel, isGridView: $isGridView, searchText: $searchText)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                isGridView.toggle()
+                            }) {
+                                Image(systemName: isGridView ? "list.bullet" : "square.grid.2x2")
+                                    .font(.title2)
+                                    .foregroundColor(.blue)
+                            }
+                        }
                     }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding()
-                .onChange(of: viewModel.selectedCategory) { newCategory in
-                    viewModel.switchCategory(to: newCategory)
-                }
+            }
+            .tabItem {
+                Image(systemName: "star.fill")
+                Text("Most Popular")
+            }
+            .tag(Tab.mostPopular)
 
-                Picker("View Style", selection: $isGridView) {
-                    Text("List").tag(false)
-                    Text("Grid").tag(true)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding()
-
-                if viewModel.isLoading && viewModel.movies.isEmpty {
-                    ProgressView()
-                } else if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                } else {
-                    if isGridView {
-                        MovieGridView(viewModel: viewModel)
-                    } else {
-                        MovieListView(viewModel: viewModel)
+            NavigationStack {
+                NowPlayingView(viewModel: viewModel, isGridView: $isGridView, searchText: $searchText)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                isGridView.toggle()
+                            }) {
+                                Image(systemName: isGridView ? "list.bullet" : "square.grid.2x2")
+                                    .font(.title2)
+                                    .foregroundColor(.blue)
+                            }
+                        }
                     }
-                }
             }
-            .navigationTitle("Movies")
-            .onAppear {
-                viewModel.fetchMovies()
+            .tabItem {
+                Image(systemName: "play.rectangle.fill")
+                Text("Now Playing")
             }
+            .tag(Tab.nowPlaying)
         }
+        .searchable(text: $searchText, prompt: "Search movies")
+
     }
 }

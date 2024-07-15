@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Movie: Decodable, Identifiable {
+struct Movie: Identifiable, Decodable {
     let id: Int
     let title: String
     let overview: String
@@ -18,14 +18,19 @@ struct Movie: Decodable, Identifiable {
     let popularity: Double
     let voteAverage: Double
     let voteCount: Int
+    let originalLanguage: String
 
-    private enum CodingKeys: String, CodingKey {
-        case id, title, overview
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title = "original_title"
+        case overview
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
         case genreIds = "genre_ids"
         case releaseDate = "release_date"
-        case popularity, voteAverage = "vote_average"
+        case popularity
+        case voteAverage = "vote_average"
         case voteCount = "vote_count"
+        case originalLanguage = "original_language"
     }
 }
